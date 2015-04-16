@@ -57,6 +57,7 @@
      <Compile Include="Assets\Scripts\Monster.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\SpawnLocation.cs" />
+     <Compile Include="Assets\Scripts\Trigger.cs" />
      <None Include="Assets\Textures\Skyboxes\_skybox info.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

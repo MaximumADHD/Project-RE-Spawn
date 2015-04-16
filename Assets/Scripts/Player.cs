@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
 
     private float lastY = 0;
     private int deathSequenceState = 0;
-    private int lastSequence = 0;
+    private int lastSequence = -1;
     private float myCameraDist = 3;
     private bool facingRight = true;
     private bool cameraGoalActive = false;
@@ -50,7 +50,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Respawn(GameObject respawn)
+    public void Respawn(SpawnLocation respawn)
     {
         facingRight = true;
         sprite.color = new Color(1, 1, 1, 1);
@@ -177,25 +177,28 @@ public class Player : MonoBehaviour
             else
             {
                 int count = 0;
-                foreach (GameObject spawn in GameObject.FindGameObjectsWithTag("Spawn"))
+                foreach (SpawnLocation spawn in GameObject.FindObjectsOfType<SpawnLocation>())
                 {
-                    Rect size = new Rect(10, 10 + (count * 30), 100, 20);
-                    GUIContent label = new GUIContent(spawn.name, spawn.name);
-                    if (GUI.Button(size, label)) // If we are pressing the button.
+                    if (spawn.isActive)
                     {
-                        Respawn(spawn);
+                        Rect size = new Rect(10, 10 + (count * 30), 100, 20);
+                        GUIContent label = new GUIContent(spawn.name, spawn.name);
+                        if (GUI.Button(size, label)) // If we are pressing the button.
+                        {
+                            Respawn(spawn);
+                        }
+                        else if (GUI.tooltip == spawn.name)
+                        {
+                            Vector3 loc = spawn.transform.localPosition;
+                            setLocalScale(1, 1, 1);
+                            transform.localPosition = loc;
+                            rigidbody2D.Sleep();
+                            sprite.color = new Color(1, 1, 1, 0.5f);
+                            cameraGoal = new Vector3(loc.x, loc.y, loc.z - myCameraDist);
+                            cameraGoalActive = true;
+                        }
+                        count++;
                     }
-                    else if (GUI.tooltip == spawn.name)
-                    {
-                        Vector3 loc = spawn.transform.localPosition;
-                        setLocalScale(1, 1, 1);
-                        transform.localPosition = loc;
-                        rigidbody2D.Sleep();
-                        sprite.color = new Color(1, 1, 1, 0.5f);
-                        cameraGoal = new Vector3(loc.x, loc.y, loc.z - myCameraDist);
-                        cameraGoalActive = true;
-                    }
-                    count++;
                 }
             }
         }
