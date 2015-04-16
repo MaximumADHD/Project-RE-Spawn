@@ -149,7 +149,7 @@ public class Player : MonoBehaviour
         if (cameraGoalActive)
         {
             Vector3 currentPos = myCamera.transform.localPosition;
-            float tweenSpeed = 0.1f;
+            float tweenSpeed = 0.3f;
             float currentX = glideTorwards(currentPos.x, cameraGoal.x, tweenSpeed);
             float currentY = glideTorwards(currentPos.y, cameraGoal.y, tweenSpeed);
             float currentZ = glideTorwards(currentPos.z, cameraGoal.z, tweenSpeed);

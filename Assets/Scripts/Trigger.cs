@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Trigger : MonoBehaviour 
+public class Trigger : MonoBehaviour
 {
     public bool triggered = false;
     public Invokable[] targetObjects;
