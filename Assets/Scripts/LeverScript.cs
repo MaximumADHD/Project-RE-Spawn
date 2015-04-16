@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// Max G 2015 <3
+// LeverScript.cs
+
+using UnityEngine;
 using System.Collections;
 
 public class LeverScript : Interactive

@@ -2,9 +2,7 @@
 // Player.cs
 
 using UnityEngine;
-using System.Timers;
 using System.Collections;
-using System.Collections.Generic;
 
 public class Player : MonoBehaviour
 {
@@ -15,7 +13,7 @@ public class Player : MonoBehaviour
     public float MoveSpeed = 2;
     public float DesiredCameraDist = 3;
     public float CameraDistTweenRate = 0.2f;
-    public int respawnDelay = 120;
+    public int respawnDelay = 120; // Time (In Frames) to wait before letting the player respawn.
     public int levelTime = 0;
     public GameObject blood;
     public GameObject InitialSpawn;
@@ -110,39 +108,38 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void OnDied()
+    {
+        setLocalScale(0, 0, 0);
+        rigidbody2D.Sleep();
+        int particles = Random.Range(70, 100);
+        for (int i = 0; i < particles; i++)
+        {
+            // SPLAT!
+            Object.Instantiate(blood, transform.localPosition, new Quaternion()); 
+        }
+    }
+
     public void DeadUpdate()
     {
-        if (deathSequenceState == 0)
-        {
-            deathSequenceState = 1;
-        }
-        else if (deathSequenceState == respawnDelay)
+        if (deathSequenceState == respawnDelay)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                deathSequenceState = respawnDelay+1;
+                deathSequenceState = respawnDelay+1; // Signals OnGUI to draw the respawn buttons.
             }
         }
         if (lastSequence != deathSequenceState)
         {
-            lastSequence = deathSequenceState;
-            if (deathSequenceState > 0) // rest in pizza
+            if (deathSequenceState < respawnDelay)
             {
-                if (deathSequenceState == 1)
+                if (deathSequenceState == 0)
                 {
-                    setLocalScale(0, 0, 0);
-                    rigidbody2D.Sleep();
-                    int particles = Random.Range(70, 100);
-                    for (int i = 0; i < particles; i++)
-                    {
-                        // SPLAT!
-                        Object.Instantiate(blood,transform.localPosition,new Quaternion()); 
-                    }
+                    // We just died.
+                    OnDied();
                 }
-                if (deathSequenceState < respawnDelay)
-                {
-                    deathSequenceState++;
-                }
+                // We need to wait a few frames before letting the player respawn.
+                deathSequenceState++;
             }
         }
     }

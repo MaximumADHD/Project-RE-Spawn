@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// Max G 2015 <3
+// BaseInvokable.cs
+
+using UnityEngine;
 using System.Collections;
 
 public abstract class Invokable : MonoBehaviour 

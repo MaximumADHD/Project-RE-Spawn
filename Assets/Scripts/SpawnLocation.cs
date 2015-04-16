@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// Max G 2015 <3
+// SpawnLocation.cs
+
+using UnityEngine;
 using System.Collections;
 
 public class SpawnLocation : Invokable

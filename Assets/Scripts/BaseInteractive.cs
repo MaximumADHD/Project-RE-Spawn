@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// Max G 2015 <3
+// BaseInteractive.cs
+
+using UnityEngine;
 using System;
 using System.Collections;
 
