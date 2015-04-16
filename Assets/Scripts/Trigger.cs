@@ -4,7 +4,7 @@ using System.Collections;
 public class Trigger : MonoBehaviour 
 {
     public bool triggered = false;
-    public Invokable targetObject;
+    public Invokable[] targetObjects;
 
     public void Start()
     {
@@ -12,14 +12,17 @@ public class Trigger : MonoBehaviour
         sprite.color = new Color(1, 1, 1, 0);
     }
 
-    public void OnCollisionEnter2D(Collision2D collider)
+    public void OnTriggerEnter2D(Collider2D collider)
     {
         GameObject hit = collider.gameObject;
         if (hit.tag == "Player" && !triggered)
         {
             Debug.Log("Trigger Hit");
             triggered = true;
-            targetObject.SetActive(true);
+            foreach (Invokable targetObject in targetObjects)
+            {
+                targetObject.SetActive(true);
+            }
         }
     }
 }

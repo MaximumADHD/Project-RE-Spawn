@@ -33,8 +33,6 @@ public class DoorScript : Invokable
             initialized = true;
             initialPos = transform.localPosition;
             goalPos = initialPos - new Vector3(0, yAxisGoal.transform.localPosition.y - transform.localPosition.y, 0);
-            Debug.Log("Intial Pos " + initialPos);
-            Debug.Log("Goal Pos " + goalPos);
         }
         else
         {
