@@ -10,6 +10,7 @@ public class LeverScript : Interactive
     public bool Activated = false;
     public Sprite OnSprite;
     public Sprite OffSprite;
+    public AudioClip leverClick;
 
     private SpriteRenderer sprite;
 
