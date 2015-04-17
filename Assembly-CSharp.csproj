@@ -53,6 +53,7 @@
      <Compile Include="Assets\Scripts\DoorScript.cs" />
      <Compile Include="Assets\Scripts\InvertGate.cs" />
      <Compile Include="Assets\Scripts\LavaScript.cs" />
+     <Compile Include="Assets\Scripts\LevelData.cs" />
      <Compile Include="Assets\Scripts\LeverScript.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
