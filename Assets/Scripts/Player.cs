@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
     public GameObject blood;
     public GameObject InitialSpawn;
     public Camera myCamera;
+    public AudioClip walkSound;
+    public AudioClip deathSound;
+    public AudioClip jumpSound;
 
     private float lastY = 0;
     private int deathSequenceState = 0;
@@ -27,6 +30,7 @@ public class Player : MonoBehaviour
     private bool cameraGoalActive = false;
     private Vector3 cameraGoal;
     private SpriteRenderer sprite;
+    private AudioSource walkClip;
 
     private void setLocalScale(float x = 1, float y = 1, float z = 1)
     {
@@ -88,6 +92,18 @@ public class Player : MonoBehaviour
                 rigidbody2D.velocity = new Vector2();
             }
         }
+        // Update Walk Sound
+        if (OnGround && !Jumping && translation.ToString() != "0" && !Dead)
+        {
+            if (!walkClip.isPlaying)
+            {
+                walkClip.Play();
+            }
+        }
+        else
+        {
+            walkClip.Pause();
+        }
         lastY = rigidbody2D.velocity.y;
         // Update Rotation
         if (facingRight)
@@ -110,6 +126,7 @@ public class Player : MonoBehaviour
 
     public void OnDied()
     {
+        AudioSource.PlayClipAtPoint(deathSound, transform.localPosition);
         setLocalScale(0, 0, 0);
         rigidbody2D.Sleep();
         int particles = Random.Range(70, 100);
@@ -213,6 +230,9 @@ public class Player : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         GameObject rootPlayer = GameObject.Find("RootPlayer");
         rootPlayer.transform.localPosition = new Vector3();
+        walkClip = gameObject.AddComponent<AudioSource>();
+        walkClip.clip = walkSound;
+        // Spawn the Player.
         if (InitialSpawn != null)
         {
             transform.localPosition = InitialSpawn.transform.localPosition;

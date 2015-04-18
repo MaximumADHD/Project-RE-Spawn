@@ -8,8 +8,13 @@ public class DoorScript : Invokable
     private float lerp = 0;
     private bool initialized = false;
 
+    public AudioClip openingSound;
+    public AudioClip closingSound;
+    public AudioClip doorHaulted;
+
     public GameObject yAxisGoal;
     public float lerpSpeed = 0.1f;
+
     private float glideTorwards(float val, float desired, float increment)
     {
         if (val > desired)
@@ -42,7 +47,14 @@ public class DoorScript : Invokable
 
     public override void OnActiveChanged(bool newState)
     {
-        // TODO: Make it play a sound here
+        if (newState)
+        {
+            AudioSource.PlayClipAtPoint(openingSound, transform.localPosition);
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(closingSound, transform.localPosition);
+        }
     }
 
     public void Update()

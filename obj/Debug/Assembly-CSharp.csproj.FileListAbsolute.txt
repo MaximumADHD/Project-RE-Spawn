@@ -1,0 +1,12 @@
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\UnityEditor.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\UnityEngine.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\nunit.framework.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\obj\Debug\Assembly-CSharp.dll
+C:\Users\Maxwell\Desktop\Project-RE-Spawn\obj\Debug\Assembly-CSharp.pdb
