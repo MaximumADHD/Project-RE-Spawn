@@ -44,7 +44,7 @@ public class Monster : MonoBehaviour
         if (hit.tag == "Player")
         {
             Player player = GameObject.FindObjectOfType<Player>();
-            player.Dead = true;
+            player.Kill("Monsters are very aggressive.\nDon't let them eat you!");
         }
     }
 }

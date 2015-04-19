@@ -10,7 +10,7 @@ public abstract class Interactive : MonoBehaviour
     public float range = 4;
     public float coolDown = 1;
     public string toolTip = "Type a message which will be shown when the player is near the object.";
-
+    public GuiStylePreset InteractUI;
     private float updated = 0;
 
     abstract public void OnInteract();
@@ -35,7 +35,7 @@ public abstract class Interactive : MonoBehaviour
                         }
                         else
                         {
-                            GUI.Label(new Rect(10, 10, 1000, 30), toolTip);
+                            GUI.Label(new Rect(0, 0, Screen.width,Screen.height), toolTip,InteractUI.Style);
                         }
                     }
                     else

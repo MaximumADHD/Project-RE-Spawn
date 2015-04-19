@@ -9,10 +9,7 @@ public class LavaScript : MonoBehaviour
         if (hit.name == "Player")
         {
             Player player = GameObject.FindObjectOfType<Player>();
-            if (!player.Dead)
-            {
-                player.Dead = true;
-            }
+            player.Kill("Jumping into a pit of spikes\nprobably isn't a good idea.");
         }
     }
 }

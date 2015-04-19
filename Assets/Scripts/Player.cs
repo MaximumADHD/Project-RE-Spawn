@@ -9,18 +9,21 @@ public class Player : MonoBehaviour
     public bool Jumping = false;
     public bool OnGround = true;
     public bool Dead = false;
+    public bool InPortal = false;
     public float JumpForce = 250;
     public float MoveSpeed = 2;
     public float DesiredCameraDist = 3;
     public float CameraDistTweenRate = 0.2f;
-    public int respawnDelay = 120; // Time (In Frames) to wait before letting the player respawn.
-    public int levelTime = 0;
+    public int respawnDelay = 120;
     public GameObject blood;
     public GameObject InitialSpawn;
     public Camera myCamera;
     public AudioClip walkSound;
     public AudioClip deathSound;
     public AudioClip jumpSound;
+    public AudioClip landSound;
+    public AudioClip respawnSound;
+    public GuiStylePreset DeathScreenUI;
 
     private float lastY = 0;
     private int deathSequenceState = 0;
@@ -28,9 +31,12 @@ public class Player : MonoBehaviour
     private float myCameraDist = 3;
     private bool facingRight = true;
     private bool cameraGoalActive = false;
+    private int jumpCoolDown = 0;
+    private SpawnLocation currentSpawn;
     private Vector3 cameraGoal;
     private SpriteRenderer sprite;
     private AudioSource walkClip;
+    private string deathCause;
 
     private void setLocalScale(float x = 1, float y = 1, float z = 1)
     {
@@ -51,6 +57,31 @@ public class Player : MonoBehaviour
         else
         {
             return desired;
+        }
+    }
+
+    private void updateClip(AudioSource clip, bool active)
+    {
+        if (active && !Dead)
+        {
+            if (!clip.isPlaying)
+            {
+                clip.volume = 1;
+                clip.Play();
+            }
+        }
+        else
+        {
+            clip.Stop();
+        }
+    }
+
+    public void Kill(string cause)
+    {
+        if (!Dead && !InPortal)
+        {
+            deathCause = cause;
+            Dead = true;
         }
     }
 
@@ -75,39 +106,48 @@ public class Player : MonoBehaviour
             rigidbody2D.velocity = new Vector2(translation * MoveSpeed, Mathf.Min(JumpForce, rigidbody2D.velocity.y));
             // Update Jump
             float vertical = Mathf.Max(0, Input.GetAxis("Vertical"));
-            if (vertical > 0 && !Jumping && OnGround)
+            if (vertical > 0 && !Jumping && OnGround && jumpCoolDown == 10)
             {
                 Jumping = true;
                 OnGround = false;
+                rigidbody2D.velocity = new Vector2();
                 rigidbody2D.AddForce(new Vector2(0, JumpForce));
-                AudioSource.PlayClipAtPoint(jumpSound, transform.localPosition);
+                if (!InPortal)
+                {
+                    AudioSource.PlayClipAtPoint(jumpSound, transform.localPosition);
+                }
             }
             else
             {
-                if (rigidbody2D.velocity.y < -1)
+                if (rigidbody2D.velocity.y < 0)
                 {
-                    OnGround = false;
                     Jumping = false;
                 }
-                else if ((lastY <= 0 && lastY > -0.0001) && !OnGround && !Jumping)
+                if (jumpCoolDown != 10)
                 {
-                    OnGround = true;
-                    rigidbody2D.velocity = new Vector2();
+                    jumpCoolDown++;
                 }
-            }
-            // Update Walk Sound
-            if (OnGround && !Jumping && translation.ToString() != "0" && !Dead)
-            {
-                if (!walkClip.isPlaying)
+                Vector2 myPos = new Vector2(transform.localPosition.x,transform.localPosition.y);
+                Vector2 castFrom = myPos - new Vector2(0,transform.localScale.y/2);
+                RaycastHit2D ray = Physics2D.Raycast(castFrom, castFrom + new Vector2(0, -100));
+                if (ray.point.y - castFrom.y == 0)
                 {
-                    walkClip.Play();
+                    if (!OnGround && !Jumping)
+                    {
+                        OnGround = true;
+                        AudioSource.PlayClipAtPoint(landSound, transform.localPosition);
+                        jumpCoolDown = 0;
+                    }
                 }
-            }
-            else
-            {
-                walkClip.Pause();
+                else if (!Jumping && OnGround)
+                {
+                    OnGround = false;
+                }
             }
             lastY = rigidbody2D.velocity.y;
+            // Update Audio
+            bool walkClipState = (OnGround && !Jumping && translation.ToString() != "0" && !Dead);
+            updateClip(walkClip,walkClipState);
             // Update Rotation
             if (facingRight)
             {
@@ -128,7 +168,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            walkClip.Pause();
+            walkClip.Stop();
         }
     }
 
@@ -147,11 +187,15 @@ public class Player : MonoBehaviour
 
     public void DeadUpdate()
     {
+        if (walkClip.isPlaying)
+        {
+            walkClip.Stop();
+        }
         if (deathSequenceState == respawnDelay)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                deathSequenceState = respawnDelay+1; // Signals OnGUI to draw the respawn buttons.
+                deathSequenceState = respawnDelay+1; // Signals OnGUI to respawn the player.
             }
         }
         if (lastSequence != deathSequenceState)
@@ -194,22 +238,41 @@ public class Player : MonoBehaviour
     {
         if (deathSequenceState > 0)
         {
-            Rect location = new Rect(20, 20, Screen.width, Screen.height);
+            int midScreenWidth = (int)(Screen.width / 2);
+            int midScreenHeight = (int)(Screen.height / 2);
             if (deathSequenceState < respawnDelay)
             {
-                GUI.Label(location, "You have died...");
+                if (currentSpawn)
+                {
+                    currentSpawn = null;
+                }
+                string deathMessage = "You died!";
+                if (deathSequenceState > 60)
+                {
+                    deathMessage = deathMessage + "\n" + deathCause;
+                }
+                GUI.Label(new Rect(0, 0, Screen.width, Screen.height), deathMessage, DeathScreenUI.Style);
             }
             else
             {
                 int count = 0;
+                if (currentSpawn != null)
+                {
+                    Vector3 loc = currentSpawn.transform.localPosition;
+                    setLocalScale(1, 1, 1);
+                    transform.localPosition = loc;
+                    rigidbody2D.Sleep();
+                    sprite.color = new Color(1, 1, 1, 0.5f);
+                    cameraGoal = new Vector3(loc.x, loc.y, loc.z - myCameraDist);
+                    cameraGoalActive = true;
+                }
                 foreach (SpawnLocation spawn in GameObject.FindObjectsOfType<SpawnLocation>())
                 {
                     if (spawn.isActive)
                     {
-                        int midScreenWidth = (int)(Screen.width / 2);
-                        int midScreenHeight = (int)(Screen.height / 2);
-                        GUI.Label(new Rect(midScreenWidth - 150, midScreenHeight - 30,300,30), "Pick a place to spawn:");
-                        Rect size = new Rect(midScreenWidth-150, midScreenHeight + (count * 30), 300, 20);
+
+                        GUI.Label(new Rect(midScreenWidth - 150, midScreenHeight - 30,300,30), "RESPAWN AT:");
+                        Rect size = new Rect(midScreenWidth-100, midScreenHeight + (count * 30), 200, 20);
                         GUIContent label = new GUIContent(spawn.name, spawn.name);
                         if (GUI.Button(size, label))
                         {
@@ -217,13 +280,7 @@ public class Player : MonoBehaviour
                         }
                         else if (GUI.tooltip == spawn.name)
                         {
-                            Vector3 loc = spawn.transform.localPosition;
-                            setLocalScale(1, 1, 1);
-                            transform.localPosition = loc;
-                            rigidbody2D.Sleep();
-                            sprite.color = new Color(1, 1, 1, 0.5f);
-                            cameraGoal = new Vector3(loc.x, loc.y, loc.z - myCameraDist);
-                            cameraGoalActive = true;
+                            currentSpawn = spawn;
                         }
                         count++;
                     }
@@ -241,8 +298,10 @@ public class Player : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         GameObject rootPlayer = GameObject.Find("RootPlayer");
         rootPlayer.transform.localPosition = new Vector3();
+        // Initialize Looping Sound Clips
         walkClip = gameObject.AddComponent<AudioSource>();
         walkClip.clip = walkSound;
+        walkClip.volume = 0;
         // Spawn the Player.
         if (InitialSpawn != null)
         {

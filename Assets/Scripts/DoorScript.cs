@@ -41,7 +41,7 @@ public class DoorScript : Invokable
         }
         else
         {
-            Debug.LogError("Failed to initialize door: No 'Y Axis Goal' was defined.");
+            Debug.LogError("Failed to initialize door '" + name + "': No 'Y Axis Goal' was defined.");
         }
     }
 
@@ -71,7 +71,36 @@ public class DoorScript : Invokable
             }
             float x = initialPos.x + ((goalPos.x - initialPos.x) * lerp);
             float y = initialPos.y + ((goalPos.y - initialPos.y) * lerp);
-            this.transform.localPosition = new Vector3(x, y, 0);
+            transform.localPosition = new Vector3(x, y, 0);
+        }
+    }
+
+    public void OnCollisionEnter2D(Collision2D hit)
+    {
+        // See if we can crush the player with the door.
+        if (hit.gameObject.name == "Player")
+        {
+            Player player = GameObject.FindObjectOfType<Player>();
+            if (!player.Dead)
+            {
+                Vector3 pos = transform.localPosition;
+                Vector3 size = transform.localScale;
+                float minX = pos.x - (size.x / 2);
+                float maxX = pos.x + (size.x / 2);
+                float bottomY = pos.y - (size.y / 2);
+                foreach (ContactPoint2D contact in hit.contacts)
+                {
+                    if (contact.point.x >= minX && contact.point.x <= maxX)
+                    {
+                        if (contact.point.y <= bottomY)
+                        {
+                            Debug.Log("SQUASH");
+                            player.Kill("Watch out for doors!\nThey can and will crush you.");
+                            player.Dead = true;
+                        }
+                    }
+                }
+            }
         }
     }
 }

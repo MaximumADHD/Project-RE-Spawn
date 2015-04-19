@@ -5,9 +5,11 @@ public class LevelData : MonoBehaviour
 {
     public string levelName = "LevelName";
     public AudioClip music;
-    public GUIStyle levelScreenModifier;
+    public AudioClip levelStartClip;
+    public AudioClip levelEndClip;
     public GameObject LevelExit;
-    public Player player;
+    public GuiStylePreset levelScreenUI;
+    public GuiStylePreset levelExitUI;
     public float musicVolume = 0.2f;
 
     private int portalEnterFrame = 0;
@@ -20,18 +22,20 @@ public class LevelData : MonoBehaviour
     private bool isInPortal = false;
     private AudioSource exitPortal;
     private SpriteRenderer sprite;
+    private Player player;
 
     public void Start()
     {
+        player = GameObject.FindObjectOfType<Player>();
         playerCamera = player.myCamera;
         sound = playerCamera.gameObject.AddComponent<AudioSource>();
         sound.clip = music;
         sound.loop = true;
         sound.volume = musicVolume;
-        exitPortal = LevelExit.GetComponent<AudioSource>();
         mover = player.rigidbody2D;
         mover.Sleep();
         sprite = player.GetComponent<SpriteRenderer>();
+        AudioSource.PlayClipAtPoint(levelStartClip,player.InitialSpawn.transform.localPosition);
     }
 
     public void OnGUI()
@@ -45,7 +49,7 @@ public class LevelData : MonoBehaviour
             }
             if (!isInPortal)
             {
-                opacity = opacity - 0.01f;
+                opacity = Mathf.Max(0,opacity - 0.01f);
             }
         }
         else
@@ -55,7 +59,15 @@ public class LevelData : MonoBehaviour
         GUI.color = new Color(1, 1, 1, opacity);
         if (framesPassed < 360 || isInPortal)
         {
-            GUI.Box(new Rect(0, 0, Screen.width, Screen.height), levelName, levelScreenModifier);
+            Rect size = new Rect(0, 0, Screen.width, Screen.height);
+            if (isInPortal)
+            {
+                GUI.Box(size,levelName,levelExitUI.Style);
+            }
+            else
+            {
+                GUI.Box(size,levelName,levelScreenUI.Style);
+            }
         }
         else
         {
@@ -73,11 +85,12 @@ public class LevelData : MonoBehaviour
         if ((player.transform.localPosition-LevelExit.transform.localPosition).magnitude < 2 && !isInPortal)
         {
             isInPortal = true;
+            player.InPortal = true;
             portalEnterFrame = framesPassed;
             levelName = "";
             sound.volume = 0;
             sound.Stop();
-            exitPortal.Play();
+            AudioSource.PlayClipAtPoint(levelEndClip,LevelExit.transform.localPosition,1);
         }
         if (isPlaying && !isInPortal)
         {
@@ -96,7 +109,7 @@ public class LevelData : MonoBehaviour
         {
             Vector3 offset = LevelExit.transform.localPosition-player.transform.localPosition;
             int update = (framesPassed - portalEnterFrame);
-            if (update > 300)
+            if (update > 320)
             {
                 opacity = opacity + 0.01f;
             }
