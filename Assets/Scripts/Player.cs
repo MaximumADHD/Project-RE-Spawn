@@ -69,58 +69,66 @@ public class Player : MonoBehaviour
 
     public void MovementUpdate()
     {
-        float translation = Input.GetAxis("Horizontal");
-        rigidbody2D.velocity = new Vector2(translation * MoveSpeed, Mathf.Min(JumpForce, rigidbody2D.velocity.y));
-        // Update Jump
-        float vertical = Mathf.Max(0, Input.GetAxis("Vertical"));
-        if (vertical > 0 && !Jumping && OnGround)
+        if (!rigidbody2D.IsSleeping())
         {
-            Jumping = true;
-            OnGround = false;
-            rigidbody2D.AddForce(new Vector2(0, JumpForce));
-        }
-        else
-        {
-            if (rigidbody2D.velocity.y < 0)
+            float translation = Input.GetAxis("Horizontal");
+            rigidbody2D.velocity = new Vector2(translation * MoveSpeed, Mathf.Min(JumpForce, rigidbody2D.velocity.y));
+            // Update Jump
+            float vertical = Mathf.Max(0, Input.GetAxis("Vertical"));
+            if (vertical > 0 && !Jumping && OnGround)
             {
+                Jumping = true;
                 OnGround = false;
-                Jumping = false;
+                rigidbody2D.AddForce(new Vector2(0, JumpForce));
+                AudioSource.PlayClipAtPoint(jumpSound, transform.localPosition);
             }
-            else if ((lastY <= 0 && lastY > -0.0001) && !OnGround && !Jumping)
+            else
             {
-                OnGround = true;
-                rigidbody2D.velocity = new Vector2();
+                if (rigidbody2D.velocity.y < -1)
+                {
+                    OnGround = false;
+                    Jumping = false;
+                }
+                else if ((lastY <= 0 && lastY > -0.0001) && !OnGround && !Jumping)
+                {
+                    OnGround = true;
+                    rigidbody2D.velocity = new Vector2();
+                }
             }
-        }
-        // Update Walk Sound
-        if (OnGround && !Jumping && translation.ToString() != "0" && !Dead)
-        {
-            if (!walkClip.isPlaying)
+            // Update Walk Sound
+            if (OnGround && !Jumping && translation.ToString() != "0" && !Dead)
             {
-                walkClip.Play();
+                if (!walkClip.isPlaying)
+                {
+                    walkClip.Play();
+                }
+            }
+            else
+            {
+                walkClip.Pause();
+            }
+            lastY = rigidbody2D.velocity.y;
+            // Update Rotation
+            if (facingRight)
+            {
+                if (translation < -0.1)
+                {
+                    facingRight = false;
+                    setLocalScale(-1);
+                }
+            }
+            else
+            {
+                if (translation > 0.1)
+                {
+                    facingRight = true;
+                    setLocalScale(1);
+                }
             }
         }
         else
         {
             walkClip.Pause();
-        }
-        lastY = rigidbody2D.velocity.y;
-        // Update Rotation
-        if (facingRight)
-        {
-            if (translation < -0.1)
-            {
-                facingRight = false;
-                setLocalScale(-1);
-            }
-        }
-        else
-        {
-            if (translation > 0.1)
-            {
-                facingRight = true;
-                setLocalScale(1);
-            }
         }
     }
 
@@ -198,9 +206,12 @@ public class Player : MonoBehaviour
                 {
                     if (spawn.isActive)
                     {
-                        Rect size = new Rect(10, 10 + (count * 30), 100, 20);
+                        int midScreenWidth = (int)(Screen.width / 2);
+                        int midScreenHeight = (int)(Screen.height / 2);
+                        GUI.Label(new Rect(midScreenWidth - 150, midScreenHeight - 30,300,30), "Pick a place to spawn:");
+                        Rect size = new Rect(midScreenWidth-150, midScreenHeight + (count * 30), 300, 20);
                         GUIContent label = new GUIContent(spawn.name, spawn.name);
-                        if (GUI.Button(size, label)) // If we are pressing the button.
+                        if (GUI.Button(size, label))
                         {
                             Respawn(spawn);
                         }
