@@ -49,11 +49,11 @@ public class DoorScript : Invokable
     {
         if (newState)
         {
-            AudioSource.PlayClipAtPoint(openingSound, transform.localPosition);
+            AudioSource.PlayClipAtPoint(openingSound, transform.localPosition,1);
         }
         else
         {
-            AudioSource.PlayClipAtPoint(closingSound, transform.localPosition);
+            AudioSource.PlayClipAtPoint(closingSound, transform.localPosition,1);
         }
     }
 

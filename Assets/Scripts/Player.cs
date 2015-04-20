@@ -25,7 +25,6 @@ public class Player : MonoBehaviour
     public AudioClip respawnSound;
     public GuiStylePreset DeathScreenUI;
 
-    private float lastY = 0;
     private int deathSequenceState = 0;
     private int lastSequence = -1;
     private float myCameraDist = 3;
@@ -114,7 +113,7 @@ public class Player : MonoBehaviour
                 rigidbody2D.AddForce(new Vector2(0, JumpForce));
                 if (!InPortal)
                 {
-                    AudioSource.PlayClipAtPoint(jumpSound, transform.localPosition);
+                    AudioSource.PlayClipAtPoint(jumpSound, transform.localPosition,1);
                 }
             }
             else
@@ -135,7 +134,7 @@ public class Player : MonoBehaviour
                     if (!OnGround && !Jumping)
                     {
                         OnGround = true;
-                        AudioSource.PlayClipAtPoint(landSound, transform.localPosition);
+                        AudioSource.PlayClipAtPoint(landSound, transform.localPosition,1);
                         jumpCoolDown = 0;
                     }
                 }
@@ -144,7 +143,6 @@ public class Player : MonoBehaviour
                     OnGround = false;
                 }
             }
-            lastY = rigidbody2D.velocity.y;
             // Update Audio
             bool walkClipState = (OnGround && !Jumping && translation.ToString() != "0" && !Dead);
             updateClip(walkClip,walkClipState);
@@ -174,8 +172,9 @@ public class Player : MonoBehaviour
 
     public void OnDied()
     {
-        AudioSource.PlayClipAtPoint(deathSound, transform.localPosition);
-        setLocalScale(0, 0, 0);
+        AudioSource.PlayClipAtPoint(deathSound, transform.localPosition,1);
+        sprite.color = new Color(1, 1, 1, 0);
+        collider2D.enabled = false;
         rigidbody2D.Sleep();
         int particles = Random.Range(70, 100);
         for (int i = 0; i < particles; i++)

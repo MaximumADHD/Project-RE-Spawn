@@ -39,6 +39,6 @@ public class LeverScript : Interactive
         }
         Activated = !Activated;
         UpdateSprite();
-        AudioSource.PlayClipAtPoint(leverClick, transform.localPosition);
+        AudioSource.PlayClipAtPoint(leverClick, transform.localPosition,1);
     }
 }

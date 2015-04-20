@@ -35,7 +35,7 @@ public class LevelData : MonoBehaviour
         mover = player.rigidbody2D;
         mover.Sleep();
         sprite = player.GetComponent<SpriteRenderer>();
-        AudioSource.PlayClipAtPoint(levelStartClip,player.InitialSpawn.transform.localPosition);
+        AudioSource.PlayClipAtPoint(levelStartClip,player.InitialSpawn.transform.localPosition,1);
     }
 
     public void OnGUI()
