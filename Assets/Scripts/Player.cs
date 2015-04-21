@@ -86,9 +86,10 @@ public class Player : MonoBehaviour
 
     public void Respawn(SpawnLocation respawn)
     {
+        AudioSource.PlayClipAtPoint(respawnSound, respawn.transform.localPosition, 1);
+        collider2D.enabled = true;
         facingRight = true;
         sprite.color = new Color(1, 1, 1, 1);
-        setLocalScale(1, 1, 1);
         rigidbody2D.WakeUp();
         rigidbody2D.transform.rotation = new Quaternion();
         rigidbody2D.transform.localPosition = respawn.transform.localPosition;
@@ -258,7 +259,6 @@ public class Player : MonoBehaviour
                 if (currentSpawn != null)
                 {
                     Vector3 loc = currentSpawn.transform.localPosition;
-                    setLocalScale(1, 1, 1);
                     transform.localPosition = loc;
                     rigidbody2D.Sleep();
                     sprite.color = new Color(1, 1, 1, 0.5f);
