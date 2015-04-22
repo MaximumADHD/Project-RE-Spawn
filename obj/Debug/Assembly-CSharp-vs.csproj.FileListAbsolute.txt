@@ -9,3 +9,14 @@ C:\Users\1701125\Documents\ProjectRESpawn\Temp\bin\Debug\Unity.DataContract.dll
 C:\Users\1701125\Documents\ProjectRESpawn\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\1701125\Documents\ProjectRESpawn\obj\Debug\Assembly-CSharp.dll
 C:\Users\1701125\Documents\ProjectRESpawn\obj\Debug\Assembly-CSharp.pdb
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\UnityEditor.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\UnityEngine.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\nunit.framework.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\Users\1701125\Documents\Project-RE-Spawn\obj\Debug\Assembly-CSharp.dll
+C:\Users\1701125\Documents\Project-RE-Spawn\obj\Debug\Assembly-CSharp.pdb
