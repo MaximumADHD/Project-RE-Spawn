@@ -8,13 +8,22 @@ public class InvertGate : Invokable
 {
     public Invokable[] ConnectedObjects;
 
+    public bool isEditorMode()
+    {
+        GameObject editorObj = GameObject.FindGameObjectWithTag("LevelEdit");
+        return editorObj != null;
+    }
+
     public void Start()
     {
-        transform.localPosition = (transform.localPosition + transform.localScale / 2);
-        transform.localScale = new Vector3();
-        foreach (Invokable ConnectedObject in ConnectedObjects)
+        if (!isEditorMode())
         {
-            ConnectedObject.SetActive(!isActive);
+            transform.localPosition = (transform.localPosition + transform.localScale / 2);
+            transform.localScale = new Vector3();
+            foreach (Invokable ConnectedObject in ConnectedObjects)
+            {
+                ConnectedObject.SetActive(!isActive);
+            }
         }
     }
 

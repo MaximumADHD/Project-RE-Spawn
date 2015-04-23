@@ -24,6 +24,9 @@ public class Player : MonoBehaviour
     public AudioClip landSound;
     public AudioClip respawnSound;
     public GuiStylePreset DeathScreenUI;
+    public SpriteSheet idleAnim;
+    public SpriteSheet walkAnim;
+    public SpriteSheet jumpAnim;
 
     private int deathSequenceState = 0;
     private int lastSequence = -1;
@@ -36,6 +39,7 @@ public class Player : MonoBehaviour
     private SpriteRenderer sprite;
     private AudioSource walkClip;
     private string deathCause;
+    private SpriteSheet currentSprite = new SpriteSheet();
 
     private void setLocalScale(float x = 1, float y = 1, float z = 1)
     {
@@ -108,6 +112,8 @@ public class Player : MonoBehaviour
             float vertical = Mathf.Max(0, Input.GetAxis("Vertical"));
             if (vertical > 0 && !Jumping && OnGround && jumpCoolDown == 10)
             {
+                jumpAnim.Reset();
+                currentSprite = jumpAnim;
                 Jumping = true;
                 OnGround = false;
                 rigidbody2D.velocity = new Vector2();
@@ -144,8 +150,28 @@ public class Player : MonoBehaviour
                     OnGround = false;
                 }
             }
-            // Update Audio
+            // Update Audio & Animation
             bool walkClipState = (OnGround && !Jumping && translation.ToString() != "0" && !Dead);
+            if (OnGround)
+            {
+                if (walkClipState)
+                {
+                    if (!currentSprite.Equals(walkAnim))
+                    {
+                        walkAnim.Reset();
+                        currentSprite = walkAnim;
+                    }
+                }
+                else
+                {
+                    if (!currentSprite.Equals(idleAnim))
+                    {
+                        idleAnim.Reset();
+                        currentSprite = idleAnim;
+                    }
+                }
+            }
+            sprite.sprite = currentSprite.NextFrame();
             updateClip(walkClip,walkClipState);
             // Update Rotation
             if (facingRight)

@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class LevelEditor : MonoBehaviour 
 {
@@ -10,22 +11,29 @@ public class LevelEditor : MonoBehaviour
     public Camera myCamera;
     private int currentSprite = 0;
     private bool levelOpen = false;
-    private bool windowOpen = false;
     private bool inputtingNew = false;
-    private string levelName = "Level1";
+    private bool inputtingOpen = false;
+    private string levelName = "LEVEL";
     private string currentPath;
     private float zoom = -10;
     private SpriteRenderer sprite;
     private string mode = "None";
     private int flipDebounce = 0;
+    private float displayTime = 0;
+    private string displayMsg = "";
 
     public void OnGUI()
     {
+        if (displayTime > 0)
+        {
+            GUI.Label(new Rect(5, Screen.height/4, Screen.width, Screen.height), displayMsg);
+            displayTime = displayTime - Time.deltaTime;
+        }
         if (levelOpen)
         {
             GUI.Label(new Rect(5, 3, 100, 30), "GameObject:");
             GUI.Label(new Rect(5, 60, 100, 35), "Mode:");
-            GUI.Label(new Rect(5, 120, 150, 500), "Editor Controls:\n\n(WASD/Arrow Keys)\nMove Camera\n\n(Left Shift)\nFast Camera\n\n(MouseWheel Up/Down)\nZoom Camera\n\n(Left Mouse)\nPerform an action based on the current mode.\n\n(Q)\nChange Block\n\n(E)\nChange Mode");
+            GUI.Label(new Rect(5, 120, 150, 500), "Editor Controls:\n\n(WASD/Arrow Keys)\nMove Camera\n\n(Left Shift)\nFast Camera\n\n(MouseWheel Up/Down)\nZoom Camera\n\n(Left Mouse)\nPerform an action based on the current mode.\n\n(Q)\nChange Block\n\n(E)\nChange Mode\n\n(R)\nSave World");
             GUI.Button(new Rect(5, 20, 150, 35), objects[currentSprite].name);
             GUI.Button(new Rect(5, 80, 150, 35), mode);
         }
@@ -36,14 +44,33 @@ public class LevelEditor : MonoBehaviour
                 GUI.Label(new Rect(5, 3, 200, 30), "Enter Level Name:");
                 levelName = GUI.TextField(new Rect(5, 23, 100, 20), levelName);
                 bool isPressing = GUI.Button(new Rect(5, 46, 100, 20), "Create");
+                bool isCanceled = GUI.Button(new Rect(5, 69, 100, 20), "Cancel");
                 if (isPressing)
                 {
-                    string path = EditorUtility.SaveFolderPanel("Choose a Folder to save in","","");
-                    if (path.Length > 0)
+                    if (levelName.Length > 0)
                     {
-                        currentPath = path;
-                        levelOpen = true;
+                        string path = Application.dataPath + "/Levels/" + levelName + ".unity";
+                        if (!File.Exists(path))
+                        {
+                            Debug.Log(path);
+                            currentPath = path;
+                            levelOpen = true;
+                        }
+                        else
+                        {
+                            displayMsg = "Error: A level with this name already exists.";
+                            displayTime = 2;
+                        }
                     }
+                    else
+                    {
+                        displayMsg = "Error: Level name cannot be blank";
+                        displayTime = 2;
+                    }
+                }
+                else if (isCanceled)
+                {
+                    inputtingNew = false;
                 }
             }
             else
@@ -53,6 +80,10 @@ public class LevelEditor : MonoBehaviour
                 if (pressingNew)
                 {
                     inputtingNew = true;
+                }
+                else if (pressingOpen)
+                {
+                    inputtingOpen = true;
                 }
             }
 
@@ -86,7 +117,7 @@ public class LevelEditor : MonoBehaviour
             else if (mode.Equals("Flip"))
             {
                 mode = "None";
-                sprite.color = new Color(1, 1, 1, 0.25f);
+                sprite.color = new Color(1, 1, 1, 0);
             }
         }
     }
@@ -120,6 +151,12 @@ public class LevelEditor : MonoBehaviour
         zoom = Mathf.Min(-3,Mathf.Max(-15,zoom + (scroll*3)));
         Vector3 cur = myCamera.transform.localPosition;
         myCamera.transform.localPosition = new Vector3(cur.x + x, cur.y + y, zoom);
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            EditorApplication.SaveScene(currentPath);
+            displayMsg = "Saved...";
+            displayTime = 1;
+        }
     }
 
     public List<GameObject> GetMouseHits()
@@ -164,7 +201,6 @@ public class LevelEditor : MonoBehaviour
             else if (mode.Equals("Flip"))
             {
                 flipDebounce++;
-                Debug.Log(flipDebounce);
                 if (flipDebounce >= 10)
                 {
                     flipDebounce = 0;
