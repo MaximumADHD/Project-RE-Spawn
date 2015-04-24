@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     public float MoveSpeed = 2;
     public float DesiredCameraDist = 3;
     public float CameraDistTweenRate = 0.2f;
+    public float CharacterScale = 1.5f;
     public int respawnDelay = 120;
     public GameObject blood;
     public GameObject InitialSpawn;
@@ -39,11 +40,11 @@ public class Player : MonoBehaviour
     private SpriteRenderer sprite;
     private AudioSource walkClip;
     private string deathCause;
-    private SpriteSheet currentSprite = new SpriteSheet();
+    private SpriteSheet currentSprite;
 
     private void setLocalScale(float x = 1, float y = 1, float z = 1)
     {
-        transform.localScale = new Vector3(x, y, z);
+        transform.localScale = new Vector3(x * CharacterScale, y * CharacterScale, z * CharacterScale);
     }
 
     private float glideTorwards(float val, float desired, float increment)
@@ -97,9 +98,19 @@ public class Player : MonoBehaviour
         rigidbody2D.WakeUp();
         rigidbody2D.transform.rotation = new Quaternion();
         rigidbody2D.transform.localPosition = respawn.transform.localPosition;
+        setLocalScale();
         Dead = false;
         deathSequenceState = 0;
         cameraGoalActive = false;
+    }
+
+    public void setCurrentSprite(SpriteSheet newSprite)
+    {
+        if (currentSprite == null || !currentSprite.Equals(newSprite))
+        {
+            newSprite.Reset();
+            currentSprite = newSprite;
+        }
     }
 
     public void MovementUpdate()
@@ -112,8 +123,7 @@ public class Player : MonoBehaviour
             float vertical = Mathf.Max(0, Input.GetAxis("Vertical"));
             if (vertical > 0 && !Jumping && OnGround && jumpCoolDown == 10)
             {
-                jumpAnim.Reset();
-                currentSprite = jumpAnim;
+                setCurrentSprite(jumpAnim);
                 Jumping = true;
                 OnGround = false;
                 rigidbody2D.velocity = new Vector2();
@@ -156,22 +166,25 @@ public class Player : MonoBehaviour
             {
                 if (walkClipState)
                 {
-                    if (!currentSprite.Equals(walkAnim))
-                    {
-                        walkAnim.Reset();
-                        currentSprite = walkAnim;
-                    }
+                    setCurrentSprite(walkAnim);
                 }
                 else
                 {
-                    if (!currentSprite.Equals(idleAnim))
-                    {
-                        idleAnim.Reset();
-                        currentSprite = idleAnim;
-                    }
+                    setCurrentSprite(idleAnim);
                 }
             }
-            sprite.sprite = currentSprite.NextFrame();
+            try
+            {
+                Sprite next = currentSprite.NextFrame();
+                if (next != null)
+                {
+                    sprite.sprite = next;
+                }
+            }
+            catch
+            {
+                // *awkward whistle*
+            }
             updateClip(walkClip,walkClipState);
             // Update Rotation
             if (facingRight)
@@ -320,6 +333,7 @@ public class Player : MonoBehaviour
         Jumping = false;
         OnGround = true;
         Dead = false;
+        setLocalScale();
         sprite = GetComponent<SpriteRenderer>();
         GameObject rootPlayer = GameObject.Find("RootPlayer");
         rootPlayer.transform.localPosition = new Vector3();
