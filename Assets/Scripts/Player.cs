@@ -294,7 +294,8 @@ public class Player : MonoBehaviour
                 string deathMessage = "You died!";
                 if (deathSequenceState > 60)
                 {
-                    deathMessage = deathMessage + "\n" + deathCause;
+                    // THIS HAS BEEN CUT FOR NOW.
+                    //deathMessage = deathMessage + "\n" + deathCause;
                 }
                 GUI.Label(new Rect(0, 0, Screen.width, Screen.height), deathMessage, DeathScreenUI.Style);
             }
@@ -365,6 +366,7 @@ public class Player : MonoBehaviour
             {
                 Debug.LogError("CRITICAL ERROR: NO SPAWNS FOUND IN WORLD");
             }
+            currentSprite = jumpAnim;
         }
     }
 

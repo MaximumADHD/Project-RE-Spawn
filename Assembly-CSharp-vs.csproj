@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\BaseInvokable.cs" />
      <Compile Include="Assets\Scripts\Blood.cs" />
      <Compile Include="Assets\Scripts\DoorScript.cs" />
+     <Compile Include="Assets\Scripts\GhostSpawner.cs" />
      <Compile Include="Assets\Scripts\GuiStylePreset.cs" />
      <Compile Include="Assets\Scripts\InvertGate.cs" />
      <Compile Include="Assets\Scripts\LevelData.cs" />
