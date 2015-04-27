@@ -6,36 +6,74 @@ using System.Collections;
 
 public class Monster : MonoBehaviour 
 {
-    public GameObject LeftNode;
-    public GameObject RightNode;
+    public SpriteSheet GhostAnim;
     public float MoveSpeed = 2;
-    private float currentForce = -1;
 
-    private void setLocalScale(float x = 0.1f, float y = 0.1f, float z = 0.1f)
+    private float currentForce = -1;
+    private SpriteRenderer sprite;
+
+    private void setLocalScale(float x = 1f, float y = 1f, float z = 1f)
     {
         transform.localScale = new Vector3(x, y, z);
+    }
+
+    private bool isEditorMode()
+    {
+        GameObject editorObj = GameObject.FindGameObjectWithTag("LevelEdit");
+        return editorObj != null;
+    }
+
+    public void Start()
+    {
+        if (!isEditorMode())
+        {
+            Rigidbody2D r = gameObject.AddComponent<Rigidbody2D>();
+            r.fixedAngle = true;
+        }
+        sprite = GetComponent<SpriteRenderer>();
     }
 	
 	public void Update() 
     {
         // EXTREMELY BASIC AI
         // We don't have enough time to make these guys smart
-        if (currentForce == -1)
+        if (!isEditorMode())
         {
-            if (transform.localPosition.x <= LeftNode.transform.localPosition.x)
+            Vector2 myPos = new Vector2(transform.localPosition.x, transform.localPosition.y);
+            if (currentForce == -1)
             {
-                currentForce = 1;
+                Vector2 castFrom = myPos + new Vector2(transform.localScale.x / -2, 0);
+                RaycastHit2D ray = Physics2D.Raycast(castFrom, castFrom + new Vector2(-500, 0));
+                Debug.Log((myPos - ray.centroid).magnitude < 0.8);
+                if ((myPos - ray.centroid).magnitude < 0.8)
+                {
+                    currentForce = 1;
+                }
+            }
+            else if (currentForce == 1)
+            {
+                Vector2 castFrom = myPos + new Vector2(transform.localScale.x / 2, 0);
+                RaycastHit2D ray = Physics2D.Raycast(castFrom, castFrom + new Vector2(500, 0));
+                if ((myPos - ray.centroid).magnitude < 1)
+                {
+                    currentForce = -1;
+                }
+            }
+            setLocalScale(-currentForce);
+            rigidbody2D.velocity = new Vector2(currentForce * MoveSpeed, rigidbody2D.velocity.y);
+            try
+            {
+                Sprite next = GhostAnim.NextFrame();
+                if (next != null)
+                {
+                    sprite.sprite = next;
+                }
+            }
+            catch
+            {
+                // *awkward whistle*
             }
         }
-        else if (currentForce == 1)
-        {
-            if (transform.localPosition.x >= RightNode.transform.localPosition.x)
-            {
-                currentForce = -1;
-            }
-        }
-        setLocalScale(currentForce/10);
-        rigidbody2D.velocity = new Vector2(currentForce*MoveSpeed,rigidbody2D.velocity.y);
 	}
 
     public void OnCollisionEnter2D(Collision2D collider)
@@ -44,7 +82,7 @@ public class Monster : MonoBehaviour
         if (hit.tag == "Player")
         {
             Player player = GameObject.FindObjectOfType<Player>();
-            player.Kill("Monsters are very aggressive.\nDon't let them eat you!");
+            player.Kill("Ghosts are very spooky.");
         }
     }
 }

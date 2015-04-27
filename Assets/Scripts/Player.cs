@@ -47,6 +47,12 @@ public class Player : MonoBehaviour
         transform.localScale = new Vector3(x * CharacterScale, y * CharacterScale, z * CharacterScale);
     }
 
+    private bool isEditorMode()
+    {
+        GameObject editorObj = GameObject.FindGameObjectWithTag("LevelEdit");
+        return editorObj != null;
+    }
+
     private float glideTorwards(float val, float desired, float increment)
     {
         // Takes a number, and tries to move it to a desired value using +/- increment and Mathf.Max/Min
@@ -329,46 +335,58 @@ public class Player : MonoBehaviour
 
     public void Start()
     {
-        // Initialize Variables.
-        Jumping = false;
-        OnGround = true;
-        Dead = false;
-        setLocalScale();
-        sprite = GetComponent<SpriteRenderer>();
-        GameObject rootPlayer = GameObject.Find("RootPlayer");
-        rootPlayer.transform.localPosition = new Vector3();
-        // Initialize Looping Sound Clips
-        walkClip = gameObject.AddComponent<AudioSource>();
-        walkClip.clip = walkSound;
-        walkClip.volume = 0;
-        // Spawn the Player.
-        if (InitialSpawn != null)
+        if (!isEditorMode())
         {
-            transform.localPosition = InitialSpawn.transform.localPosition;
-            return;
-        }
-        Debug.LogWarning("Player.InitialSpawn was not properly set!");
-        GameObject availableSpawn = GameObject.FindGameObjectWithTag("Spawn");
-        if (availableSpawn != null)
-        {
-            transform.localPosition = availableSpawn.transform.localPosition;
-        }
-        else
-        {
-            Debug.LogError("CRITICAL ERROR: NO SPAWNS FOUND IN WORLD");
+            // Initialize Variables.
+            Jumping = false;
+            OnGround = true;
+            Dead = false;
+            setLocalScale();
+            sprite = GetComponent<SpriteRenderer>();
+            GameObject rootPlayer = GameObject.Find("RootPlayer");
+            rootPlayer.transform.localPosition = new Vector3();
+            // Initialize Looping Sound Clips
+            walkClip = gameObject.AddComponent<AudioSource>();
+            walkClip.clip = walkSound;
+            walkClip.volume = 0;
+            // Spawn the Player.
+            if (InitialSpawn != null)
+            {
+                transform.localPosition = InitialSpawn.transform.localPosition;
+                return;
+            }
+            Debug.LogWarning("Player.InitialSpawn was not properly set!");
+            GameObject availableSpawn = GameObject.FindGameObjectWithTag("Spawn");
+            if (availableSpawn != null)
+            {
+                transform.localPosition = availableSpawn.transform.localPosition;
+            }
+            else
+            {
+                Debug.LogError("CRITICAL ERROR: NO SPAWNS FOUND IN WORLD");
+            }
         }
     }
 
     public void Update()
     {
-        if (!Dead)
+        if (isEditorMode())
         {
-            MovementUpdate();
+            transform.localPosition = new Vector3(99999,99999,99999);
+            renderer.enabled = false;
         }
         else
         {
-            DeadUpdate();
+            renderer.enabled = true;
+            if (!Dead)
+            {
+                MovementUpdate();
+            }
+            else
+            {
+                DeadUpdate();
+            }
+            CameraUpdate();
         }
-        CameraUpdate();
     }
 }

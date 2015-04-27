@@ -12,7 +12,6 @@ public class DoorScript : Invokable
     public AudioClip closingSound;
     public AudioClip doorHaulted;
 
-    public GameObject yAxisGoal;
     public float lerpSpeed = 0.1f;
 
     private float glideTorwards(float val, float desired, float increment)
@@ -33,16 +32,9 @@ public class DoorScript : Invokable
 
     public void Start()
     {
-        if (yAxisGoal != null)
-        {
-            initialized = true;
-            initialPos = transform.localPosition;
-            goalPos = initialPos + new Vector3(0, transform.localScale.y*2, 0);
-        }
-        else
-        {
-            Debug.LogError("Failed to initialize door '" + name + "': No 'Y Axis Goal' was defined.");
-        }
+        initialized = true;
+        initialPos = transform.localPosition;
+        goalPos = initialPos + new Vector3(0, 2, 0);
     }
 
     public override void OnActiveChanged(bool newState)
@@ -95,7 +87,7 @@ public class DoorScript : Invokable
                         if (contact.point.y <= bottomY)
                         {
                             Debug.Log("SQUASH");
-                            player.Kill("Watch out for doors!\nThey can and will crush you.");
+                            player.Kill("Watch out for doors!\nThey will crush you if given the opportunity.");
                             player.Dead = true;
                         }
                     }
