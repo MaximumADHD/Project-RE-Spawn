@@ -17,6 +17,9 @@ public class MenuLogic : MonoBehaviour
     private bool showingLogo = false;
     private bool inLevelMenu = false;
     private int currentFrame = 0;
+    private float lastUpdate = 0;
+    private bool inPlayMenu = false;
+
     private float glideTorwards(float val, float desired, float increment)
     {
         // Takes a number, and tries to move it to a desired value using +/- increment and Mathf.Max/Min
@@ -33,12 +36,12 @@ public class MenuLogic : MonoBehaviour
             return desired;
         }
     }
+
     public void Start()
     {
-        MenuLogic logic = FindObjectOfType<MenuLogic>();
-        if (logic.playIntro)
+        AudioSource.PlayClipAtPoint(music, myCamera.transform.localPosition, 1);
+        if (playIntro)
         {
-            AudioSource.PlayClipAtPoint(music, myCamera.transform.localPosition, 1);
             Animation hatAnim = casualHatGames.gameObject.GetComponent<Animation>();
             hatAnim.Play();
         }
@@ -48,6 +51,18 @@ public class MenuLogic : MonoBehaviour
         }
     }
 
+    public void OnGUI()
+    {
+        if (!inPlayMenu && showingLogo)
+        {
+            bool pressingPlay = GUI.Button(new Rect(Screen.width * 0.2f, 300, 200, 60), "Start Game");
+            if (pressingPlay)
+            {
+                showingLogo = false;
+                inPlayMenu = true;
+            }
+        }
+    }
 
     public void Update()
     {
@@ -55,7 +70,7 @@ public class MenuLogic : MonoBehaviour
         actualTimeElapsed = actualTimeElapsed + Time.deltaTime;
         timeElapsed = actualTimeElapsed;
         // Do things
-        if (timeElapsed > 5 && !showingLogo && !inLevelMenu)
+        if (timeElapsed > 5 && !showingLogo && !inPlayMenu)
         {
             showingLogo = true;
         }
@@ -64,11 +79,15 @@ public class MenuLogic : MonoBehaviour
         {
             goal = 0.5f;
         }
-        logoTransparency = glideTorwards(logoTransparency,goal,0.01f);
+        Debug.Log(goal);
+        logoTransparency = glideTorwards(logoTransparency, goal, 0.1f);
         logo.color = new Color(0.5f, 0.5f, 0.5f, logoTransparency);
         guy.color = new Color(0.5f, 0.5f, 0.5f, logoTransparency);
-        currentFrame = (currentFrame+1)%5;
-        guy.texture = guyAnim[currentFrame];
+        if ((timeElapsed - lastUpdate) > 0.07)
+        {
+            lastUpdate = timeElapsed;
+            currentFrame = (currentFrame + 1) % 8;
+            guy.texture = guyAnim[currentFrame];
+        }  
     }
-
 }
