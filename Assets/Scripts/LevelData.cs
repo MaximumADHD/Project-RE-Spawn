@@ -11,6 +11,7 @@ public class LevelData : MonoBehaviour
     public GuiStylePreset levelScreenUI;
     public GuiStylePreset levelExitUI;
     public float musicVolume = 0.2f;
+    public GuiStylePreset clockStyle;
 
     private int portalEnterFrame = 0;
     private int framesPassed = 0;
@@ -23,6 +24,7 @@ public class LevelData : MonoBehaviour
     private AudioSource exitPortal;
     private SpriteRenderer sprite;
     private Player player;
+    private float time = 0;
 
     private bool isEditorMode()
     {
@@ -45,6 +47,18 @@ public class LevelData : MonoBehaviour
             sprite = player.GetComponent<SpriteRenderer>();
             AudioSource.PlayClipAtPoint(levelStartClip, player.InitialSpawn.transform.localPosition, 1);
         }
+    }
+    
+    public string formatTime()
+    {
+        float seconds = Mathf.Floor(time % 60);
+        float minutes = Mathf.Floor(time / 60);
+        string actualSeconds = seconds.ToString();
+        if (actualSeconds.Length == 1)
+        {
+            actualSeconds = "0" + actualSeconds;
+        }
+        return minutes + ":" + actualSeconds;
     }
 
     public void OnGUI()
@@ -87,6 +101,12 @@ public class LevelData : MonoBehaviour
                     isPlaying = true;
                     sound.Play();
                 }
+            }
+            if (!isInPortal && isPlaying && !player.Dead)
+            {
+                time = time + (Time.deltaTime/2);
+                GUI.color = new Color(0, 0, 1, 1);
+                GUI.Label(new Rect(3, 3, Screen.width, Screen.height), formatTime(),clockStyle.Style);
             }
         }
         else

@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\InvertGate.cs" />
      <Compile Include="Assets\Scripts\LevelData.cs" />
      <Compile Include="Assets\Scripts\LevelEditor.cs" />
+     <Compile Include="Assets\Scripts\LevelInfo.cs" />
      <Compile Include="Assets\Scripts\LeverScript.cs" />
      <Compile Include="Assets\Scripts\MenuLogic.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
@@ -62,6 +63,7 @@
      <Compile Include="Assets\Scripts\SpawnLocation.cs" />
      <Compile Include="Assets\Scripts\Spikes.cs" />
      <Compile Include="Assets\Scripts\SpriteSheet.cs" />
+     <Compile Include="Assets\Scripts\ToggleBlock.cs" />
      <Compile Include="Assets\Scripts\Trigger.cs" />
      <None Include="Assets\Textures\Skyboxes\_skybox info.txt" />
   </ItemGroup>

@@ -29,6 +29,7 @@ public class LeverScript : Interactive
     {
         sprite = GetComponent<SpriteRenderer>();
         UpdateSprite();
+        this.toolTip = "";
     }
 
     public override void OnInteract()

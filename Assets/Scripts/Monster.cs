@@ -44,7 +44,6 @@ public class Monster : MonoBehaviour
             {
                 Vector2 castFrom = myPos + new Vector2(transform.localScale.x / -2, 0);
                 RaycastHit2D ray = Physics2D.Raycast(castFrom, castFrom + new Vector2(-500, 0));
-                Debug.Log((myPos - ray.centroid).magnitude < 0.8);
                 if ((myPos - ray.centroid).magnitude < 0.8)
                 {
                     currentForce = 1;

@@ -9,16 +9,19 @@ public class MenuLogic : MonoBehaviour
     public GUITexture guy;
     public Texture[] guyAnim = new Texture[5];
     public GUITexture casualHatGames;
-    
     public bool playIntro = true;
     public float timeElapsed = 0;
+    public LevelInfo[] levels;
+    public float buttonWidth = 300;
+    public float buttonHeight = 50;
+    public float buttonSpacing = 10;
+
     private float actualTimeElapsed = 0;
     private float logoTransparency = 0;
     private bool showingLogo = false;
     private bool inLevelMenu = false;
     private int currentFrame = 0;
     private float lastUpdate = 0;
-    private bool inPlayMenu = false;
 
     private float glideTorwards(float val, float desired, float increment)
     {
@@ -53,13 +56,32 @@ public class MenuLogic : MonoBehaviour
 
     public void OnGUI()
     {
-        if (!inPlayMenu && showingLogo)
+        if (!inLevelMenu)
         {
-            bool pressingPlay = GUI.Button(new Rect(Screen.width * 0.2f, 300, 200, 60), "Start Game");
-            if (pressingPlay)
+            if (showingLogo)
             {
-                showingLogo = false;
-                inPlayMenu = true;
+                bool pressingPlay = GUI.Button(new Rect(Screen.width * 0.2f, 300, 200, 60), "Start Game");
+                if (pressingPlay)
+                {
+                    showingLogo = false;
+                    inLevelMenu = true;
+                }
+            }
+        }
+        else
+        {
+            float spread = buttonHeight + buttonSpacing;
+            float totalHeight = ((float)levels.Length * spread);
+            float cornerX = ((Screen.width/2) - (buttonWidth / 2));
+            float cornerY = ((Screen.height/2) - (totalHeight / 2));
+            for (int i = 0; i < levels.Length; i++)
+            {
+                LevelInfo level = levels[i];
+                bool pressing = GUI.Button(new Rect(cornerX, cornerY + (spread * i), buttonWidth, buttonHeight), "#" + level.levelId + ": " + level.levelName);
+                if (pressing)
+                {
+                    Application.LoadLevel("Level" + level.levelId);
+                }
             }
         }
     }
@@ -70,7 +92,7 @@ public class MenuLogic : MonoBehaviour
         actualTimeElapsed = actualTimeElapsed + Time.deltaTime;
         timeElapsed = actualTimeElapsed;
         // Do things
-        if (timeElapsed > 5 && !showingLogo && !inPlayMenu)
+        if (timeElapsed > 5 && !showingLogo && !inLevelMenu)
         {
             showingLogo = true;
         }
@@ -78,16 +100,15 @@ public class MenuLogic : MonoBehaviour
         if (showingLogo)
         {
             goal = 0.5f;
+            if ((timeElapsed - lastUpdate) > 0.07)
+            {
+                lastUpdate = timeElapsed;
+                currentFrame = (currentFrame + 1) % 8;
+                guy.texture = guyAnim[currentFrame];
+            }
         }
-        Debug.Log(goal);
         logoTransparency = glideTorwards(logoTransparency, goal, 0.1f);
         logo.color = new Color(0.5f, 0.5f, 0.5f, logoTransparency);
         guy.color = new Color(0.5f, 0.5f, 0.5f, logoTransparency);
-        if ((timeElapsed - lastUpdate) > 0.07)
-        {
-            lastUpdate = timeElapsed;
-            currentFrame = (currentFrame + 1) % 8;
-            guy.texture = guyAnim[currentFrame];
-        }  
     }
 }
