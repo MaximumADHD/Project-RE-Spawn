@@ -4,7 +4,7 @@ using System.Collections;
 public class Blood : MonoBehaviour 
 {
     public float velocity = 250;
-    public float lifeCycle = 1;
+    public float lifeCycle = 5;
     private float killAt;
 
     public void Start()
