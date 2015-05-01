@@ -12,6 +12,7 @@ public class LevelData : MonoBehaviour
     public GuiStylePreset levelExitUI;
     public float musicVolume = 0.2f;
     public GuiStylePreset clockStyle;
+    public bool isPaused = false;
 
     private int portalEnterFrame = 0;
     private int framesPassed = 0;
@@ -25,6 +26,7 @@ public class LevelData : MonoBehaviour
     private SpriteRenderer sprite;
     private Player player;
     private float time = 0;
+    
 
     private bool isEditorMode()
     {
@@ -130,22 +132,50 @@ public class LevelData : MonoBehaviour
                     float cornerY = (Screen.height / 2) - (boxHeight / 2);
                     clockStyle.Style.alignment = TextAnchor.MiddleCenter;
                     clockStyle.Style.contentOffset = new Vector2();
-                    Debug.Log(clockStyle.Style.font);
                     GUI.Box(new Rect(cornerX, cornerY, boxWidth, boxHeight), "");
-                    GUI.Label(new Rect(cornerX+20, cornerY, boxWidth-40, boxHeight * (2f / 3f)),"Level completed!\nTime: " + formatTime(),clockStyle.Style);
-                    bool returnTo = GUI.Button(new Rect(cornerX + 30, cornerY + (boxHeight * (2f/3f)), boxWidth-60, boxHeight/3 - 30), "Return to the Menu");
+                    GUI.Label(new Rect(cornerX + 20, cornerY, boxWidth - 40, boxHeight * (2f / 3f)), "Level completed!\nTime: " + formatTime(), clockStyle.Style);
+                    bool returnTo = GUI.Button(new Rect(cornerX + 30, cornerY + (boxHeight * (2f / 3f)), boxWidth - 60, boxHeight / 3 - 30), "Return to the Menu");
                     if (returnTo)
                     {
                         Application.LoadLevel("ReturnToMenu");
                     }
                 }
             }
+            if (isPaused)
+            {
+                Time.timeScale = 0;
+                GUI.Box(new Rect(0, 0, Screen.width, Screen.height),"");
+                float boxWidth = 300;
+                float boxHeight = 200;
+                float cornerX = (Screen.width / 2) - (boxWidth / 2);
+                float cornerY = (Screen.height / 2) - (boxHeight / 2);
+                GUI.Box(new Rect(cornerX, cornerY, boxWidth, boxHeight), "");
+                bool returnToGame = GUI.Button(new Rect(cornerX+50, cornerY + 10, boxWidth-100, boxHeight / 3f - 20), "RETURN TO THE GAME");
+                if (returnToGame)
+                {
+                    isPaused = false;
+                }
+                bool restartLevel = GUI.Button(new Rect(cornerX + 50, cornerY + (boxHeight / 3) + 10, boxWidth - 100, boxHeight / 3f - 20),"RESTART LEVEL");
+                if (restartLevel)
+                {
+                    Application.LoadLevel(Application.loadedLevel);
+                }
+                bool returnToMenu = GUI.Button(new Rect(cornerX + 50, cornerY + (boxHeight*(2f/3f)) + 10, boxWidth - 100, boxHeight / 3f - 20), "RETURN TO MENU");
+                if (returnToMenu)
+                {
+                    Application.LoadLevel("ReturnToMenu");
+                }
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
         }
         else
         {
-            LevelEditor edit = GameObject.FindObjectOfType<LevelEditor>();
-            if (edit.levelOpen)
-            {
+            //LevelEditor edit = GameObject.FindObjectOfType<LevelEditor>();
+            //if (edit.levelOpen)
+            //{
                 GameObject[] exits = GameObject.FindGameObjectsWithTag("Portal");
                 if (exits.Length == 0)
                 {
@@ -163,7 +193,7 @@ public class LevelData : MonoBehaviour
                         }
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -184,7 +214,11 @@ public class LevelData : MonoBehaviour
             }
             if (isPlaying && !isInPortal)
             {
-                if (player.Dead)
+                if (isPaused)
+                {
+                    sound.volume = 0;
+                }
+                else if (player.Dead)
                 {
                     sound.pitch = Mathf.Max(0.1f, sound.pitch - 0.005f);
                     sound.volume = Mathf.Max(0, sound.volume - (0.005f * musicVolume));
@@ -215,6 +249,10 @@ public class LevelData : MonoBehaviour
                     player.transform.localPosition = player.transform.localPosition + move;
                 }
                 mover.Sleep();
+            }
+            if (Input.GetKeyDown(KeyCode.Escape) && !player.Dead && !isInPortal && isPlaying)
+            {
+                isPaused = true;
             }
         }
         else

@@ -12,8 +12,20 @@ public class SpriteSheet : MonoBehaviour
         update++;
         if (update >= 6 * (8/frames.Length))
         {
-            update = 0;
-            currentFrame = (currentFrame + 1) % frames.Length;
+            bool canUpdate = true; // Gets set to false if we're paused.
+            LevelData data = GameObject.FindObjectOfType<LevelData>();
+            if (data != null)
+            {
+                if (data.isPaused)
+                {
+                    canUpdate = false;
+                }
+            }
+            if (canUpdate)
+            {
+                update = 0;
+                currentFrame = (currentFrame + 1) % frames.Length;
+            }
         }
         return frames[currentFrame];
     }

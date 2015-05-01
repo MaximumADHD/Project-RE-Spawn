@@ -7,8 +7,10 @@ using System.Collections;
 
 public class ReturnToMenu : MonoBehaviour 
 {
+    public Camera myCamera;
     public void Start()
     {
         Application.LoadLevelAdditive("Menu");
+        Object.DestroyImmediate(myCamera.GetComponent<AudioListener>());
     }
 }

@@ -42,6 +42,8 @@ public class MenuLogic : MonoBehaviour
 
     public void Start()
     {
+        Debug.Log("Started");
+        Time.timeScale = 1;
         ReturnToMenu isReturning = GameObject.FindObjectOfType<ReturnToMenu>();
         if (isReturning != null)
         {
@@ -65,11 +67,16 @@ public class MenuLogic : MonoBehaviour
         {
             if (showingLogo)
             {
-                bool pressingPlay = GUI.Button(new Rect(Screen.width * 0.2f, 300, 200, 60), "Start Game");
+                bool pressingPlay = GUI.Button(new Rect(Screen.width * 0.2f, Screen.height * 0.6f, 200, 60), "Start Game");
                 if (pressingPlay)
                 {
                     showingLogo = false;
                     inLevelMenu = true;
+                }
+                bool pressingQuit = GUI.Button(new Rect(Screen.width * 0.2f, Screen.height * 0.8f, 200, 60), "Quit");
+                if (pressingQuit)
+                {
+                    Application.Quit();
                 }
             }
         }

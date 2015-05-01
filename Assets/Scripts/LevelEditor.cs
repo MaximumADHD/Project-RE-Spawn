@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿/*/
+
+using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
@@ -256,6 +258,6 @@ public class LevelEditor : MonoBehaviour
             sprite.color = new Color(0, 0, 0, 0);
         }
     }
-
-
 }
+
+/*/
