@@ -42,7 +42,12 @@ public class MenuLogic : MonoBehaviour
 
     public void Start()
     {
-        AudioSource.PlayClipAtPoint(music, myCamera.transform.localPosition, 1);
+        ReturnToMenu isReturning = GameObject.FindObjectOfType<ReturnToMenu>();
+        if (isReturning != null)
+        {
+            playIntro = false;
+        }
+        AudioSource.PlayClipAtPoint(music, myCamera.transform.localPosition);
         if (playIntro)
         {
             Animation hatAnim = casualHatGames.gameObject.GetComponent<Animation>();

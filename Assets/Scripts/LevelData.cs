@@ -46,19 +46,27 @@ public class LevelData : MonoBehaviour
             mover.Sleep();
             sprite = player.GetComponent<SpriteRenderer>();
             AudioSource.PlayClipAtPoint(levelStartClip, player.InitialSpawn.transform.localPosition, 1);
+            clockStyle.Style.alignment = TextAnchor.LowerLeft;
+            clockStyle.Style.contentOffset = new Vector2(10, -10);
         }
+    }
+
+    public string clockForm(float num)
+    {
+        string actualNum = num.ToString();
+        if (actualNum.Length == 1)
+        {
+            actualNum = "0" + actualNum;
+        }
+        return actualNum;
     }
     
     public string formatTime()
     {
+        float milliseconds = Mathf.Floor((time * 100) % 100);
         float seconds = Mathf.Floor(time % 60);
         float minutes = Mathf.Floor(time / 60);
-        string actualSeconds = seconds.ToString();
-        if (actualSeconds.Length == 1)
-        {
-            actualSeconds = "0" + actualSeconds;
-        }
-        return minutes + ":" + actualSeconds;
+        return clockForm(minutes) + ":" + clockForm(seconds) + ":" + clockForm(milliseconds);
     }
 
     public void OnGUI()
@@ -102,11 +110,35 @@ public class LevelData : MonoBehaviour
                     sound.Play();
                 }
             }
-            if (!isInPortal && isPlaying && !player.Dead)
+            if (!isInPortal && isPlaying)
             {
-                time = time + (Time.deltaTime/2);
-                GUI.color = new Color(0, 0, 1, 1);
-                GUI.Label(new Rect(3, 3, Screen.width, Screen.height), formatTime(),clockStyle.Style);
+                if (!player.Dead)
+                {
+                    time = time + (Time.deltaTime / 2);
+                }
+                GUI.color = new Color(1, 1, 1, 1);
+                GUI.Label(new Rect(3, 3, Screen.width, Screen.height), formatTime(), clockStyle.Style);
+            }
+            else if (isInPortal)
+            {
+                if (opacity >= 1)
+                {
+                    float boxWidth = 300;
+                    float boxHeight = 200;
+                    ////
+                    float cornerX = (Screen.width / 2) - (boxWidth / 2);
+                    float cornerY = (Screen.height / 2) - (boxHeight / 2);
+                    clockStyle.Style.alignment = TextAnchor.MiddleCenter;
+                    clockStyle.Style.contentOffset = new Vector2();
+                    Debug.Log(clockStyle.Style.font);
+                    GUI.Box(new Rect(cornerX, cornerY, boxWidth, boxHeight), "");
+                    GUI.Label(new Rect(cornerX+20, cornerY, boxWidth-40, boxHeight * (2f / 3f)),"Level completed!\nTime: " + formatTime(),clockStyle.Style);
+                    bool returnTo = GUI.Button(new Rect(cornerX + 30, cornerY + (boxHeight * (2f/3f)), boxWidth-60, boxHeight/3 - 30), "Return to the Menu");
+                    if (returnTo)
+                    {
+                        Application.LoadLevel("ReturnToMenu");
+                    }
+                }
             }
         }
         else
@@ -165,6 +197,9 @@ public class LevelData : MonoBehaviour
             }
             else if (isInPortal)
             {
+                player.setCurrentSprite(player.walkAnim);
+                player.NextAnimFrame();
+                player.transform.Rotate(Vector3.forward, -1);
                 Vector3 offset = LevelExit.transform.localPosition-player.transform.localPosition;
                 int update = (framesPassed - portalEnterFrame);
                 if (update > 320)

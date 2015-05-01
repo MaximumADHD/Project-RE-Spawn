@@ -34,13 +34,14 @@ public class Player : MonoBehaviour
     private float myCameraDist = 3;
     private bool facingRight = true;
     private bool cameraGoalActive = false;
-    private int jumpCoolDown = 0;
+    private int jumpCoolDown = 10;
     private SpawnLocation currentSpawn;
     private Vector3 cameraGoal;
     private SpriteRenderer sprite;
     private AudioSource walkClip;
     private string deathCause;
     private SpriteSheet currentSprite;
+    private float timeElapsed = 0;
 
     private void setLocalScale(float x = 1, float y = 1, float z = 1)
     {
@@ -82,7 +83,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            clip.Stop();
+            clip.Pause();
         }
     }
 
@@ -116,6 +117,22 @@ public class Player : MonoBehaviour
         {
             newSprite.Reset();
             currentSprite = newSprite;
+        }
+    }
+
+    public void NextAnimFrame()
+    {
+        try
+        {
+            Sprite next = currentSprite.NextFrame();
+            if (next != null)
+            {
+                sprite.sprite = next;
+            }
+        }
+        catch
+        {
+            // *awkward whistle*
         }
     }
 
@@ -164,6 +181,7 @@ public class Player : MonoBehaviour
                 else if (!Jumping && OnGround)
                 {
                     OnGround = false;
+                    setCurrentSprite(jumpAnim);
                 }
             }
             // Update Audio & Animation
@@ -179,18 +197,7 @@ public class Player : MonoBehaviour
                     setCurrentSprite(idleAnim);
                 }
             }
-            try
-            {
-                Sprite next = currentSprite.NextFrame();
-                if (next != null)
-                {
-                    sprite.sprite = next;
-                }
-            }
-            catch
-            {
-                // *awkward whistle*
-            }
+            NextAnimFrame();
             updateClip(walkClip,walkClipState);
             // Update Rotation
             if (facingRight)
@@ -281,6 +288,7 @@ public class Player : MonoBehaviour
 
     public void OnGUI()
     {
+        timeElapsed = timeElapsed + (Time.deltaTime / 2);
         if (deathSequenceState > 0)
         {
             int midScreenWidth = (int)(Screen.width / 2);
@@ -304,10 +312,17 @@ public class Player : MonoBehaviour
                 int count = 0;
                 if (currentSpawn != null)
                 {
+                    setCurrentSprite(jumpAnim);
+                    Sprite next = currentSprite.NextFrame();
+                    if (next != null)
+                    {
+                        sprite.color = new Color(0, 0, 0, 1);
+                        sprite.sprite = next;
+                    }
                     Vector3 loc = currentSpawn.transform.localPosition;
                     transform.localPosition = loc;
                     rigidbody2D.Sleep();
-                    sprite.color = new Color(1, 1, 1, 0.5f);
+                    sprite.color = new Color(0,0.5f + Mathf.Sin(Time.timeSinceLevelLoad*6.28f),0.5f + Mathf.Cos(Time.timeSinceLevelLoad*6.28f), 0.5f + (Mathf.Cos(Time.timeSinceLevelLoad*6.28f)/4));
                     cameraGoal = new Vector3(loc.x, loc.y, loc.z - myCameraDist);
                     cameraGoalActive = true;
                 }
