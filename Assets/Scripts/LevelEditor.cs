@@ -1,4 +1,6 @@
-﻿/*/
+// TO USE THE LEVEL EDITOR, REMOVE LINES 3 AND 265
+// Make sure you comment it out again when trying to build the game.
+/*/
 
 using UnityEngine;
 using UnityEditor;
